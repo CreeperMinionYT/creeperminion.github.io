@@ -9,5 +9,12 @@
       "videos": [],
       "statistics": []
     }
+      "id": "c25",
+      "name": "C25",
+      "subtitle": "Carbine",
+      "image":  "assets/weapons/C25Horizontal.png",
+      "position": { "x": 200, "y": 27, "width": 32 },
+      "videos": [],
+      "statistics": []
   ]
 }
