@@ -1,22 +1,30 @@
-/* ===== QUICK-CHANGE SETTINGS =====
-   Change these values to tune the look without touching JavaScript.
-   .46 = 46% black over the room when a weapon is hovered/selected.
-*/
+/* ================================================================
+   CREEPERMINION ARMORY / QUICK DESIGN CONTROLS
+   Change these before modifying other styles.
+   ================================================================ */
 :root {
-  --dim-strength: .46;
+  --dim-strength: .46;        /* .46 = room becomes 46% darker */
   --fade-speed: 200ms;
   --highlight-brightness: 1.22;
   --highlight-glow: 0 0 9px rgba(192,231,255,.85);
-  --panel-background: rgba(18,32,44,.97);
-  --panel-width: 350px;
+
+  --panel-width: 380px;       /* Desktop width in px */
+  --panel-max-height: 76dvh;
+  --panel-background: rgba(20, 33, 45, .97);
+  --panel-border: #67889c;
+  --panel-accent: #95b7cb;
+  --link-background: #29475e;
+  --link-hover: #3a6683;
+  --thumb-width: 92px;        /* Set to 0 only after modifying thumbnail CSS */
 }
 
 * { box-sizing: border-box; }
 html, body { width: 100%; height: 100%; margin: 0; }
-body { overflow: hidden; background: #101010; color: #e9f3f9; font-family: Arial, Helvetica, sans-serif; }
+body { overflow: hidden; background: #101010; color: #eef4f8; font-family: Arial, Helvetica, sans-serif; }
 
-/* 'contain' behavior: full 16:9 picture remains visible, with bars if needed.
-   We keep ONE 16:9 coordinate system so Photoshop artwork stays aligned. */
+/* ===== ROOM =====
+   "Fit" behavior: always show the complete 16:9 room, without cropping.
+   All gun coordinates stay relative to THIS element, not browser dimensions. */
 #stage { width: 100vw; height: 100dvh; display: grid; place-items: center; }
 #scene {
   position: relative;
@@ -34,44 +42,86 @@ body { overflow: hidden; background: #101010; color: #e9f3f9; font-family: Arial
   transition: opacity var(--fade-speed) ease;
 }
 #scene.is-active #dimmer { opacity: 1; }
-
-/* Each gun is a transparent PNG independently placed from weapons.json.
-   Transparent portions of the PNG do NOT count as hotspots (script.js checks alpha). */
 #weapons-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .weapon {
   position: absolute; display: block; padding: 0; margin: 0;
-  border: 0; background: transparent;
-  pointer-events: none; /* mouse handling is centralized in the scene */
+  border: 0; background: transparent; pointer-events: none;
   outline-offset: 5px;
 }
-.weapon img { width: 100%; height: auto; display: block; pointer-events: none;
+.weapon img { display: block; width: 100%; height: auto; pointer-events: none;
   transition: filter var(--fade-speed) ease; }
 .weapon.lit img { filter: brightness(var(--highlight-brightness)) drop-shadow(var(--highlight-glow)); }
 .weapon:focus-visible { outline: 2px solid #c7eaff; }
 
-/* Fixed to viewport, NOT inside the scaled image: text stays readable on phones. */
+/* ===== FLOATING PANEL =====
+   Fixed to the VIEWPORT (not inside scaled room) so text is readable on phones.
+   JS positions the panel near the selected gun and keeps it on-screen. */
 #panel {
   position: fixed; z-index: 20;
   width: min(var(--panel-width), calc(100vw - 24px));
-  max-height: min(75dvh, 520px);
-  overflow: auto; padding: 16px;
+  max-height: min(var(--panel-max-height), 680px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 15px;
   background: var(--panel-background);
-  border: 1px solid #6a91a9; box-shadow: 0 12px 34px #0009;
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 16px 44px rgba(0,0,0,.6);
+  scrollbar-width: thin;
+  scrollbar-color: #54748a transparent;
 }
 #panel[hidden] { display: none; }
-.panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.eyebrow { color: #a0bfd1; font-size: 11px; letter-spacing: .06em; }
-h1 { margin: 5px 0 0; font-size: 23px; }
-#close { color: #fff; border: 0; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; }
-.section { margin: 16px 0 7px; border-top: 1px solid #526675; padding-top: 12px; font-size: 11px; letter-spacing: .06em; color: #a9bfd0; }
-.resource { display: block; padding: 11px; margin-top: 7px; text-decoration: none; color: #fff; background: #29465e; font-size: 14px; }
-.resource:hover, .resource:focus-visible { background: #3b6583; }
-.empty { color: #b3c1cc; font-size: 13px; margin: 8px 0 0; }
+.panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.panel-heading { min-width: 0; }
+.eyebrow { color: var(--panel-accent); font-size: 10px; font-weight: bold; letter-spacing: .09em; }
+h1 { margin: 6px 0 0; font-size: 24px; line-height: 1.1; }
+#panel-subtitle { margin: 6px 0 0; color: #b6c5ce; font-size: 12px; }
+#close { flex: 0 0 auto; color: #eaf2f7; border: 0; background: transparent;
+  padding: 0 3px; font-size: 28px; line-height: 1; cursor: pointer; }
+#close:hover, #close:focus-visible { color: #fff; background: #35556b; }
+.resource-section { margin-top: 15px; border-top: 1px solid #455e70; padding-top: 11px; }
+.resource-section h2 { margin: 0 0 8px; color: var(--panel-accent);
+  font-size: 11px; font-weight: 700; letter-spacing: .09em; }
+.resource-list { display: grid; gap: 7px; }
 
-/* Mobile popup is centered; room itself still fits fully into available width. */
+/* Each link has optional mini thumbnail, title, description, and external arrow. */
+.resource {
+  min-height: 56px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px; color: #f4f7fa; background: var(--link-background);
+  text-decoration: none; border: 1px solid transparent;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.resource:hover, .resource:focus-visible {
+  background: var(--link-hover); border-color: #8db6cc;
+  outline: none;
+}
+.resource-thumb {
+  display: block; flex: 0 0 var(--thumb-width);
+  width: var(--thumb-width); aspect-ratio: 16 / 9;
+  object-fit: cover; background: #1b2833;
+}
+.resource-thumb[hidden] { display: none; }
+.resource-content { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.resource-title { font-size: 13px; font-weight: bold; line-height: 1.25; overflow-wrap: anywhere; }
+.resource-detail { color: #c2d3de; font-size: 11px; line-height: 1.25; }
+.resource-arrow { flex: 0 0 auto; margin-left: 2px; color: #bbd0dd; font-size: 16px; }
+.empty { margin: 3px 0 0; color: #b5c6d1; font-size: 12px; font-style: italic; }
+
+/* ===== PHONE / SMALL TOUCH SCREENS =====
+   Popups remain human-readable, independent of the scaled-down room.
+   We center the popup and cap its height so visitors can always dismiss it. */
 @media (max-width: 700px), (pointer: coarse) {
-  #panel { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); }
+  #panel {
+    left: 50% !important; top: 50% !important;
+    transform: translate(-50%, -50%);
+    max-height: calc(100dvh - 24px);
+  }
+}
+@media (max-width: 390px) {
+  :root { --thumb-width: 76px; }
+  #panel { padding: 12px; }
+  .resource-title { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #dimmer, .weapon img { transition: none; }
+  #dimmer, .weapon img, .resource { transition: none; }
 }
