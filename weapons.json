@@ -15,7 +15,12 @@
       "subtitle": "Carbine",
       "image":  "assets/weapons/C25Horizontal.png",
       "position": { "x": 60, "y": 27, "width": 32 },
-      "videos": [],
+      "videos": [
+        {
+          "title": "C25 Review Video",
+          "URL": "https://www.youtube.com/watch?v=Bs9qGUM0R7U"
+        }
+      ],
       "statistics": []
     }
   ]
