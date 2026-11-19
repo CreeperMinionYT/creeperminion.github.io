@@ -1,0 +1,12 @@
+{
+  "weapons": [
+    {
+      "id": "ak47",
+      "name": "AK47",
+      "image": "assets/weapons/AK47.png",
+      "position": { "x": 34, "y": 27, "width": 32 },
+      "videos": [],
+      "statistics": []
+    }
+  ]
+}
