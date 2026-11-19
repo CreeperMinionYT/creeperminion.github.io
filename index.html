@@ -2,39 +2,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Creeperminion Armory</title>
   <style>
     * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #111;
+    html, body { margin: 0; min-height: 100%; background: #101010; color: #f0f5f7; font-family: Arial, Helvetica, sans-serif; }
+    body { overflow: hidden; }
+    #stage { width: 100vw; height: 100dvh; display: grid; place-items: center; }
+    #scene { position: relative; width: min(100vw, 177.777778dvh); aspect-ratio: 16 / 9; isolation: isolate; user-select: none; }
+    #room { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+    #dimmer { position: absolute; inset: 0; background: rgba(0,0,0,.46); opacity: 0; transition: opacity 200ms ease; z-index: 1; pointer-events: none; }
+    #scene.is-active #dimmer { opacity: 1; }
+    .weapon { position: absolute; padding: 0; border: 0; background: transparent; cursor: pointer; z-index: 2; outline-offset: 5px; }
+    .weapon img { display: block; width: 100%; height: auto; pointer-events: none; transition: filter 200ms ease; }
+    .weapon.lit img { filter: brightness(1.22) drop-shadow(0 0 9px rgba(192,231,255,.85)); }
+    .weapon:focus-visible { outline: 2px solid #c7eaff; }
+    #panel { position: fixed; z-index: 20; width: min(350px, calc(100vw - 24px)); max-height: min(75dvh, 520px); overflow: auto; padding: 16px; background: rgba(18,32,44,.97); border: 1px solid #6a91a9; box-shadow: 0 12px 34px #0009; color: #e9f3f9; }
+    #panel[hidden] { display: none; }
+    .panel-header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+    .eyebrow { color: #a0bfd1; font-size: 11px; letter-spacing: .06em; }
+    h1 { margin: 5px 0 0; font-size: 23px; }
+    #close { color: #fff; border: 0; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; }
+    .section { margin: 16px 0 7px; border-top: 1px solid #526675; padding-top: 12px; font-size: 11px; letter-spacing: .06em; color: #a9bfd0; }
+    .resource { display: block; padding: 11px; margin-top: 7px; text-decoration: none; color: #fff; background: #29465e; font-size: 14px; }
+    .resource:hover, .resource:focus-visible { background: #3b6583; }
+    .empty { color: #b3c1cc; font-size: 13px; margin: 8px 0 0; }
+    @media (max-width: 700px), (pointer: coarse) {
+      #panel { left: 50% !important; top: 50% !important; transform: translate(-50%,-50%); }
     }
-
-    main {
-      width: 100%;
-      height: 100dvh;
-      display: grid;
-      place-items: center;
-    }
-
-    .scene {
-      width: min(100vw, 177.7778dvh);
-      aspect-ratio: 16 / 9;
-      background: url("WebpageBG1.png")
-                  center / 100% 100% no-repeat;
-    }
+    @media (prefers-reduced-motion: reduce) { #dimmer, .weapon img { transition: none; } }
   </style>
 </head>
 <body>
-  <main>
-    <div class="scene"></div>
+  <main id="stage">
+    <div id="scene" aria-label="Interactive Phantom Forces armory">
+      <img id="room" src="WebpageBG1.png" alt="Phantom Forces-style armory room">
+      <div id="dimmer"></div>
+      <button id="gun" class="weapon" type="button" aria-label="Explore AK47">
+        <img id="gun-image" src="AK47.png" alt="AK47">
+      </button>
+    </div>
   </main>
+  <aside id="panel" hidden aria-label="Weapon links">
+    <div class="panel-header">
+      <div><div class="eyebrow">PHANTOM FORCES / WEAPON INTEL</div><h1>AK47</h1></div>
+      <button id="close" type="button" aria-label="Close panel">×</button>
+    </div>
+    <div class="section">VIDEOS</div><div id="videos"></div>
+    <div class="section">STATISTICS & DOCUMENTS</div><div id="stats"></div>
+  </aside>
+  <script>
+    // Edit these values when you want to reposition or resize the AK47.
+    // Each number is a percentage of the full 1920×1080 scene.
+    const weapon = {
+      x: 34, y: 27, width: 32,
+      videos: [
+        // { title: 'AK47 weapon guide', url: 'https://www.youtube.com/watch?v=...' }
+      ],
+      statistics: [
+        // { title: 'AK47 statistics', url: 'https://docs.google.com/spreadsheets/d/...' }
+      ]
+    };
+
+    const scene = document.getElementById('scene');
+    const gun = document.getElementById('gun');
+    const gunImage = document.getElementById('gun-image');
+    const panel = document.getElementById('panel');
+    const closeButton = document.getElementById('close');
+    let selected = false, hovering = false, alphaContext = null;
+
+    gun.style.left = weapon.x + '%';
+    gun.style.top = weapon.y + '%';
+    gun.style.width = weapon.width + '%';
+
+    // Test the image alpha channel so transparent areas don't act as hotspots.
+    function prepareHitMap() {
+      if (!gunImage.complete || !gunImage.naturalWidth) return;
+      const c = document.createElement('canvas');
+      c.width = gunImage.naturalWidth;
+      c.height = gunImage.naturalHeight;
+      alphaContext = c.getContext('2d', { willReadFrequently: true });
+      alphaContext.drawImage(gunImage, 0, 0);
+    }
+    gunImage.addEventListener('load', prepareHitMap);
+    if (gunImage.complete) prepareHitMap();
+
+    function onWeapon(clientX, clientY) {
+      const b = gun.getBoundingClientRect();
+      if (clientX < b.left || clientX >= b.right || clientY < b.top || clientY >= b.bottom) return false;
+      if (!alphaContext) return true; // fallback during image loading
+      const x = Math.floor((clientX - b.left) / b.width * gunImage.naturalWidth);
+      const y = Math.floor((clientY - b.top) / b.height * gunImage.naturalHeight);
+      return alphaContext.getImageData(x, y, 1, 1).data[3] > 55;
+    }
+    function redraw() {
+      scene.classList.toggle('is-active', hovering || selected);
+      gun.classList.toggle('lit', hovering || selected);
+      scene.style.cursor = hovering ? 'pointer' : 'default';
+    }
+    function renderLinks(targetId, links) {
+      const target = document.getElementById(targetId);
+      target.replaceChildren();
+      if (!links.length) {
+        const p = document.createElement('p');
+        p.className = 'empty'; p.textContent = 'Links coming soon'; target.append(p);
+      }
+      for (const { title, url } of links) {
+        if (!/^https:\/\//i.test(url)) continue;
+        const a = document.createElement('a');
+        a.className = 'resource'; a.textContent = title;
+        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; target.append(a);
+      }
+    }
+    function openPanel() {
+      selected = true;
+      renderLinks('videos', weapon.videos);
+      renderLinks('stats', weapon.statistics);
+      panel.hidden = false;
+      const b = gun.getBoundingClientRect();
+      const w = Math.min(350, window.innerWidth - 24);
+      const left = b.right + 16 + w <= window.innerWidth - 12 ? b.right + 16 : Math.max(12, b.left - w - 16);
+      panel.style.left = left + 'px';
+      panel.style.top = Math.max(12, Math.min(b.top, window.innerHeight - panel.offsetHeight - 12)) + 'px';
+      redraw();
+    }
+    function closePanel() { selected = false; panel.hidden = true; redraw(); }
+
+    scene.addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch') return;
+      hovering = onWeapon(e.clientX, e.clientY);
+      redraw();
+    });
+    scene.addEventListener('pointerleave', () => { hovering = false; redraw(); });
+    scene.addEventListener('click', e => {
+      if (onWeapon(e.clientX, e.clientY)) openPanel();
+      else closePanel();
+    });
+    gun.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); }
+    });
+    document.addEventListener('pointerdown', e => {
+      if (selected && !scene.contains(e.target) && !panel.contains(e.target)) closePanel();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+    closeButton.addEventListener('click', closePanel);
+  </script>
 </body>
 </html>
