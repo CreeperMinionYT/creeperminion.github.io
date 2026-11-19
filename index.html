@@ -4,39 +4,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#863bff">
+  <meta name="theme-color" content="#101010">
   <title>Creeperminion Armory</title>
-  <!-- This file is intentionally small. Edit appearance in style.css,
-       behavior in script.js, and weapons/links in weapons.json. -->
+  <!-- Keep this file small. Styling lives in style.css; behavior in script.js;
+       weapon positions and links in weapons.json. -->
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <main id="stage">
     <div id="scene" aria-label="Interactive Phantom Forces armory">
-      <!-- KEEP your existing background image in the repository root.
-           If you rename it, change this src attribute. -->
-      <img id="room" src="assets/resources/WebpageBG1.png" alt="Phantom Forces-style armory room" draggable="false">
-      <!-- Dimming goes OVER the room but BEHIND the weapons. -->
+      <!-- EDIT HERE only when you move/rename the room background.
+           Your recently moved background now lives under assets/resources/. -->
+      <img id="room" src="assets/resources/WebpageBG1.png"
+           alt="Phantom Forces-style armory room" draggable="false">
       <div id="dimmer" aria-hidden="true"></div>
-      <!-- script.js will create all the weapon buttons here. -->
+      <!-- The script puts transparent, clickable weapon images here. -->
       <div id="weapons-layer"></div>
     </div>
   </main>
 
-  <!-- One popup is reused for all weapons and future clickable objects. -->
-  <aside id="panel" hidden aria-label="Weapon resources" role="dialog" aria-modal="false" aria-labelledby="panel-title">
+  <!-- ONE reusable information panel, regardless of how many guns we add. -->
+  <aside id="panel" hidden role="dialog" aria-modal="false" aria-labelledby="panel-title">
     <div class="panel-header">
-      <div>
+      <div class="panel-heading">
         <div class="eyebrow">PHANTOM FORCES / WEAPON INTEL</div>
         <h1 id="panel-title"></h1>
+        <p id="panel-subtitle" hidden></p>
       </div>
-      <button id="close" type="button" aria-label="Close panel">×</button>
+      <button id="close" type="button" aria-label="Close weapon information">×</button>
     </div>
-    <div class="section">VIDEOS</div>
-    <div id="videos"></div>
-    <div class="section">STATISTICS &amp; DOCUMENTS</div>
-    <div id="stats"></div>
+    <section class="resource-section" aria-labelledby="videos-label">
+      <h2 id="videos-label">VIDEOS</h2>
+      <div id="videos" class="resource-list"></div>
+    </section>
+    <section class="resource-section" aria-labelledby="stats-label">
+      <h2 id="stats-label">STATISTICS &amp; DOCUMENTS</h2>
+      <div id="stats" class="resource-list"></div>
+    </section>
   </aside>
 </body>
 </html>
