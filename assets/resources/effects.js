@@ -17,7 +17,7 @@
     minParticles: 8,        // Don't overcrowd a narrow mobile scene
     densityReference: 1400 * 800, // CSS px area at which maxParticles applies
     minRadius: 0.8,        // Particle radius, CSS pixels
-    maxRadius: 3.0,
+    maxRadius: 5.0,
     minOpacity: 0.10,     // 0 = invisible, 1 = fully opaque
     maxOpacity: 0.2,
     minFallSpeed: 3,       // CSS pixels per second
