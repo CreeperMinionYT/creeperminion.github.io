@@ -28,5 +28,19 @@
       ],
       "statistics": []
     }
+        {
+      "id": "m4a1",
+      "name": "M4A1",
+      "subtitle": "Carbine",
+      "image": "assets/weapons/M4A1Horizontal.png",
+      "position": { "x": 10, "y": 27, "width": 32 },
+      "videos": [
+        {
+          "title": "M4A1 Starter Build",
+          "url": "https://www.youtube.com/watch?v=87zC9GCJzPE&t=95s"
+        }
+      ],
+      "statistics": []
+    },
   ]
 }
