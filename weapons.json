@@ -41,6 +41,20 @@
         }
       ],
       "statistics": []
+    },
+            {
+      "id": "automagiii",
+      "name": "Automag III",
+      "subtitle": "Pistol",
+      "image": "assets/weapons/AutomagIIIHorizontal.png",
+      "position": { "x": 15, "y": 15, "width": 32 },
+      "videos": [
+        {
+          "title": "Insane Automag III Build",
+          "url": "https://www.youtube.com/shorts/yydeKXlapq0"
+        }
+      ],
+      "statistics": []
     }
   ]
 }
