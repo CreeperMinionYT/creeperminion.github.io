@@ -47,7 +47,7 @@
       "name": "Automag III",
       "subtitle": "Pistol",
       "image": "assets/weapons/AutomagIIIHorizontal.png",
-      "position": { "x": 15, "y": 15, "width": 32 },
+      "position": { "x": 11, "y": 15, "width": 15 },
       "videos": [
         {
           "title": "Insane Automag III Build",
