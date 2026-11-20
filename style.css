@@ -107,6 +107,26 @@ h1 { margin: 6px 0 0; font-size: 24px; line-height: 1.1; }
 .resource-arrow { flex: 0 0 auto; margin-left: 2px; color: #bbd0dd; font-size: 16px; }
 .empty { margin: 3px 0 0; color: #b5c6d1; font-size: 12px; font-style: italic; }
 
+/* ===== WEAPON DROP SHADOWS ===== */
+
+/* Adjust these values to customize the shadows */
+:root {
+  --weapon-shadow: 6px 8px 5px rgba(0, 0, 0, 0.65);
+}
+
+/* Normal weapon appearance */
+.weapon img {
+  filter: drop-shadow(var(--weapon-shadow));
+}
+
+/* Highlighted weapon: preserve both shadow and glow */
+.weapon.lit img {
+  filter:
+    brightness(var(--highlight-brightness))
+    drop-shadow(var(--weapon-shadow))
+    drop-shadow(var(--highlight-glow));
+}
+
 /* ===== PHONE / SMALL TOUCH SCREENS =====
    Popups remain human-readable, independent of the scaled-down room.
    We center the popup and cap its height so visitors can always dismiss it. */
